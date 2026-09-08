@@ -141,6 +141,78 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/09/08/Notes-for-OpenCV/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Enderman.jpg">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Enderman">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2026/09/08/Notes-for-OpenCV/" class="post-title-link" itemprop="url">Notes for OpenCV</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-09-08 09:50:00 / 修改时间：10:15:19" itemprop="dateCreated datePublished" datetime="2026-09-08T09:50:00+08:00">2026-09-08</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="OpenCV-学习笔记"><a href="#OpenCV-学习笔记" class="headerlink" title="OpenCV 学习笔记"></a>OpenCV 学习笔记</h1><ol>
+<li><figure class="highlight plaintext"><figcaption><span>是重要容器类，储存图像矩阵（像素点阵）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">2. ``` cv::imread(&quot;path of the photo&quot;, cv::IMREAD_COLOR)``` 读取图片</span><br><span class="line"></span><br><span class="line">3. ``` cv::IMREAD_COLOR``` 表示加载彩色图像（BGR 三通道），也可以写成 1</span><br><span class="line"></span><br><span class="line">4. 用 ``` image.empty() ``` 进行错误检查 </span><br><span class="line"></span><br><span class="line">5. ``` cv::imshow(&quot;title&quot;, (the Mat))``` 显示图片</span><br><span class="line"></span><br><span class="line">6. ``` cv::waitkey(0) ``` 无限等待键盘按键</span><br><span class="line"></span><br><span class="line">7. ``` cv::imwrite``` 输出文件名</span><br><span class="line"></span><br><span class="line">8. ``` cv::destroyAllWindows()``` 释放所有窗口</span><br><span class="line"></span><br><span class="line">9. 从相机中读取一帧</span><br><span class="line"></span><br><span class="line">   ``` cpp</span><br><span class="line">   cv::Mat image;</span><br><span class="line">   cv::VideoCapture cap(0);</span><br><span class="line">   cap &gt;&gt; image;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>图像转化为 HSV 颜色空间（色调、饱和度、明度），并筛选 lower 到 upper 的指定颜色范围，范围内赋值 255（白色），范围外赋值 0（黑色）<br>其中色调的范围为 $[0,180]$。对于红色需要特殊处理（写两个 <code>inrange</code>，然后用 <code>cv::bitwise_or</code> 将两个掩码合并） </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cv::<span class="built_in">cvtColor</span>(image, hsv, cv::COLOR_BGR2HSV);</span><br><span class="line">cv::<span class="built_in">inRange</span>(hsv, lower, upper, mask);</span><br></pre></td></tr></table></figure>
+</li>
+<li><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cv::<span class="built_in">GaussianBlur</span>(src, dst, cv::<span class="built_in">Size</span>(<span class="number">5</span>, <span class="number">5</span>), <span class="number">0</span>);</span><br><span class="line">cv::<span class="built_in">erode</span>(mask, mask, kernel);</span><br><span class="line">cv::<span class="built_in">dilate</span>(mask, mask, kernel);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><figcaption><span>为高斯滤波，对图像平滑处理以消除噪点，```cv::Size(num, num)``` 代表卷积核大小，核越大，图像越模糊，其中 ```num``` 必须为奇数。```0``` 代表标准差自动根据核的大小计算（也可以手动指定）。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">``` erode``` 为腐蚀，把白色区域边界向内收缩，直观感受是白色物体变小，黑色区域变大，从而保留主体，去除白色噪点。</span><br><span class="line"></span><br><span class="line">``` dilate``` 为膨胀，因为 ```erode``` 使图像缩小一圈，会影响轮廓检测准确性。膨胀的作用是把缩小的尺寸补回来。</span><br><span class="line"></span><br><span class="line">2、3 行通常一起使用。</span><br><span class="line"></span><br><span class="line">``` kernel``` 需要预先定义，语句为：</span><br><span class="line"></span><br><span class="line">```  </span><br><span class="line">cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code> MORPH_RECT</code> 意思为矩形核，也可以改为 <code>MORPH_CROSS</code>（十字）和 <code> MORPH_ELLIPSE</code>（椭圆）。</p>
+</li>
+<li></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2026/08/29/Diary/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -172,7 +244,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2026-09-04 18:46:19" itemprop="dateModified" datetime="2026-09-04T18:46:19+08:00">2026-09-04</time>
+                <time title="修改时间：2026-09-07 16:21:07" itemprop="dateModified" datetime="2026-09-07T16:21:07+08:00">2026-09-07</time>
               </span>
 
           
@@ -276,12 +348,12 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
